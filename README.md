@@ -67,9 +67,11 @@ resume-jd-gap-analyzer/
 ## Team
 
 5 student contributors participating in an SDSU AI Club Fall 2026 project.
+- Andrea Panaitidi
 - Cameron Penaranda
 - Justin Paul Liporada
-- 
+- Kaya Manglona
+- Patrick Wong
 
 ## Status
 
