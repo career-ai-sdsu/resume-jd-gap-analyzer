@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <main class="container">
+        <h1>Upload Your Resume</h1>
+        <p class="subtitle">Select a file from your computer or drag and drop it below.</p>
+
+        <div class="drop-zone" id="drop-zone" role="button" tabindex="0">
+            <div class="upload-icon">📁</div>
+            <h2>Drag and drop your file here</h2>
+            <p>or <span class="browse-text">browse files</span></p>
+            <p>PDF, DOCX, TXT, PNG, JPG, and other file types</p>
+            <input type="file" id="file-input">
+        </div>
+
+        <div class="file-info" id="file-info">
+            <div class="file-icon">📄</div>
+            <div class="file-details">
+                <div class="file-name" id="file-name"></div>
+                <div class="file-size" id="file-size"></div>
+            </div>
+            <button type="button" class="remove-button" id="remove-button" aria-label="Remove selected file">✕</button>
+        </div>
+
+        <button class="submit-button" id="submit-button" disabled>Submit File</button>
+        <p class="footer-text">File is only selected locally. No upload occurs yet.</p>
+    </main>
+
+    <script>
+        const dropZone = document.getElementById("drop-zone");
+        const fileInput = document.getElementById("file-input");
+        const fileInfo = document.getElementById("file-info");
+        const fileName = document.getElementById("file-name");
+        const fileSize = document.getElementById("file-size");
+        const removeButton = document.getElementById("remove-button");
+        const submitButton = document.getElementById("submit-button");
+        let selectedFile = null;
+
+        dropZone.addEventListener("click", () => fileInput.click());
+
+        dropZone.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                fileInput.click();
+            }
+        });
+
+        fileInput.addEventListener("change", () => {
+            if (fileInput.files.length > 0) selectFile(fileInput.files[0]);
+        });
+
+        dropZone.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            dropZone.classList.add("drag-over");
+        });
+
+        dropZone.addEventListener("dragleave", (event) => {
+            if (!dropZone.contains(event.relatedTarget)) dropZone.classList.remove("drag-over");
+        });
+
+        dropZone.addEventListener("drop", (event) => {
+            event.preventDefault();
+            dropZone.classList.remove("drag-over");
+            if (event.dataTransfer.files.length > 0) selectFile(event.dataTransfer.files[0]);
+        });
+
+        function selectFile(file) {
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.style.display = "flex";
+            submitButton.disabled = false;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + " bytes";
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+            return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+        }
+
+        removeButton.addEventListener("click", () => {
+            selectedFile = null;
+            fileInput.value = "";
+            fileInfo.style.display = "none";
+            submitButton.disabled = true;
+        });
+
+        submitButton.addEventListener("click", () => {
+            if (selectedFile) {
+                alert("File selected: " + selectedFile.name + "\n\nActual submission functionality will be added later.");
+            }
+        });
+    </script>
+</body>
+</html>
