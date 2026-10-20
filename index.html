@@ -3,99 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload</title>
+    <meta name="description" content="Find or import a job listing, then compare it with the evidence in your resume.">
+    <title>Resume / JD Gap Analyzer</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <main class="container">
-        <h1>Upload Your Resume</h1>
-        <p class="subtitle">Select a file from your computer or drag and drop it below.</p>
-
-        <div class="drop-zone" id="drop-zone" role="button" tabindex="0">
-            <div class="upload-icon">📁</div>
-            <h2>Drag and drop your file here</h2>
-            <p>or <span class="browse-text">browse files</span></p>
-            <p>PDF, DOCX, TXT, PNG, JPG, and other file types</p>
-            <input type="file" id="file-input">
-        </div>
-
-        <div class="file-info" id="file-info">
-            <div class="file-icon">📄</div>
-            <div class="file-details">
-                <div class="file-name" id="file-name"></div>
-                <div class="file-size" id="file-size"></div>
+    <main class="app-shell">
+        <header class="hero">
+            <p class="eyebrow">Resume / JD Gap Analyzer</p>
+            <h1>Find the right role for the resume you already have.</h1>
+            <p class="subtitle">Upload your resume, review a real job listing, and run the existing evidence-based analysis when a backend is connected.</p>
+        </header>
+        <nav class="workflow" aria-label="Analysis workflow">
+            <span class="workflow-step is-active"><b>1</b> Upload resume</span><span class="workflow-line"></span><span class="workflow-step"><b>2</b> Find or import jobs</span><span class="workflow-line"></span><span class="workflow-step"><b>3</b> Review results</span>
+        </nav>
+        <section class="panel" id="resume-panel" aria-labelledby="resume-heading">
+            <div class="section-heading"><div><p class="section-kicker">Stage 1</p><h2 id="resume-heading">Upload your resume</h2></div><span class="badge">Required</span></div>
+            <p class="section-intro">Your resume stays local in this browser prototype until you connect a processing endpoint.</p>
+            <div class="drop-zone" id="drop-zone" role="button" tabindex="0" aria-label="Choose a resume PDF"><div class="upload-icon" aria-hidden="true">↑</div><div><h3>Drop a PDF here</h3><p>or <span class="browse-text">browse files</span></p><small>PDF only · maximum 10 MB</small></div><input type="file" id="file-input" accept="application/pdf,.pdf"></div>
+            <div class="file-info" id="file-info" hidden><span class="file-icon" aria-hidden="true">PDF</span><div class="file-details"><strong class="file-name" id="file-name"></strong><span class="file-size" id="file-size"></span></div><button type="button" class="icon-button" id="remove-button" aria-label="Remove selected resume">×</button></div>
+            <button class="primary-button" id="submit-button" disabled>Use this resume</button><p class="status-message" id="status-message" role="status" aria-live="polite"></p>
+        </section>
+        <section class="panel" id="jobs-panel" aria-labelledby="jobs-heading">
+            <div class="section-heading"><div><p class="section-kicker">Stage 2</p><h2 id="jobs-heading">Find a Job to Match Against Your Resume</h2></div><span class="badge badge-muted">Choose one or more</span></div>
+            <p class="section-intro">Search a configured provider, paste a listing, or import a job advertisement. A match score is only available after a valid job description is confirmed.</p>
+            <div class="method-tabs" role="tablist" aria-label="Job input methods"><button class="method-tab is-active" id="tab-search" role="tab" aria-selected="true" aria-controls="search-method">Search jobs</button><button class="method-tab" id="tab-paste" role="tab" aria-selected="false" aria-controls="paste-method">Copy &amp; paste text</button><button class="method-tab" id="tab-upload" role="tab" aria-selected="false" aria-controls="upload-method">Upload an ad</button></div>
+            <div class="method-pane" id="search-method" role="tabpanel" aria-labelledby="tab-search">
+                <form id="search-form" class="form-grid"><label>Job title or keywords<input name="keywords" type="search" placeholder="e.g. Junior Python Developer"></label><label>Company name <span class="optional">Optional</span><input name="company" type="text" placeholder="e.g. Acme"></label><label>Location <span class="optional">Optional</span><input name="location" type="text" placeholder="City, state, or country"></label><label>Work arrangement <span class="optional">Optional</span><select name="work_arrangement"><option value="">Any arrangement</option><option>Remote</option><option>Hybrid</option><option>On-site</option></select></label><label>Employment type <span class="optional">Optional</span><select name="employment_type"><option value="">Any type</option><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option></select></label><label>Posted after <span class="optional">Optional</span><input name="posted_after" type="date"></label><button class="primary-button form-submit" type="submit">Search configured provider</button></form>
+                <div class="notice notice-info" id="provider-notice"><strong>Live search is not configured.</strong><span>Connect a permitted job API through the backend to show real listings. No example jobs are displayed here.</span></div><div class="results-list" id="search-results" aria-live="polite"></div>
             </div>
-            <button type="button" class="remove-button" id="remove-button" aria-label="Remove selected file">✕</button>
-        </div>
-
-        <button class="submit-button" id="submit-button" disabled>Submit File</button>
-        <p class="footer-text">File is only selected locally. No upload occurs yet.</p>
+            <div class="method-pane" id="paste-method" role="tabpanel" aria-labelledby="tab-paste" hidden>
+                <div class="notice notice-info"><strong>Copy and paste any job listing text.</strong><span>After you review the parsed requirements, confirm it to send the job to your selected comparison queue.</span></div>
+                <form id="paste-form" class="stack-form"><div class="form-grid"><label>Job title <span class="optional">Optional</span><input id="paste-title" name="job_title" type="text" placeholder="e.g. Data Analyst"></label><label>Company name <span class="optional">Optional</span><input id="paste-company" name="company" type="text" placeholder="e.g. Acme"></label><label>Job URL <span class="optional">Optional</span><input id="paste-url" name="source_url" type="url" placeholder="https://..."></label><label>Location <span class="optional">Optional</span><input id="paste-location" name="location" type="text" placeholder="Remote or city"></label></div><label>Copy and paste the full job description<textarea id="paste-description" name="description" rows="10" placeholder="Paste the complete job description, including requirements and responsibilities."></textarea></label><button class="primary-button form-submit" type="submit">Review pasted job</button></form><div class="preview-card" id="paste-preview" hidden></div>
+            </div>
+            <div class="method-pane" id="upload-method" role="tabpanel" aria-labelledby="tab-upload" hidden><div class="import-grid"><div><h3>Import a screenshot or document</h3><p class="muted">PNG, JPEG, WebP, PDF, and plain text are accepted. Files are treated as untrusted input and are never executed.</p><label class="file-picker">Choose job advertisement<input id="job-file-input" type="file" accept="image/png,image/jpeg,image/webp,application/pdf,text/plain,.png,.jpg,.jpeg,.webp,.pdf,.txt"></label></div><div class="notice notice-warning" id="ocr-notice"><strong>Review required.</strong><span>OCR can be imperfect. Extracted text must be corrected and confirmed before it can be parsed or matched.</span></div></div><div id="upload-preview" class="preview-card" hidden></div></div>
+        </section>
+        <section class="panel selection-panel" id="selection-panel" aria-labelledby="selection-heading"><div class="section-heading"><div><p class="section-kicker">Review queue</p><h2 id="selection-heading">Selected jobs</h2></div><span class="selection-count" id="selection-count">0 selected</span></div><div class="empty-state" id="selection-empty">Confirmed listings will appear here. You can select several jobs and compare them against the same resume.</div><div class="selected-list" id="selected-jobs"></div><div class="selection-actions"><label class="batch-limit">Batch limit <select id="batch-limit"><option>3</option><option>5</option><option>10</option></select></label><button class="primary-button" id="compare-button" disabled>Compare selected jobs</button></div><p class="status-message" id="comparison-status" role="status" aria-live="polite"></p></section>
+        <section class="panel" id="results-panel" aria-labelledby="results-heading"><div class="section-heading"><div><p class="section-kicker">Stage 3</p><h2 id="results-heading">Resume compatibility results</h2></div><span class="badge badge-muted">Internal alignment only</span></div><p class="section-intro">Search relevance and resume compatibility are separate signals. The alignment score is not a probability of being hired.</p><div class="empty-state" id="results-empty">No comparison has been run yet. Confirm at least one valid job listing first.</div><div class="comparison-table-wrap" id="results-table-wrap" hidden><table class="comparison-table"><thead><tr><th>Job</th><th>Internal alignment</th><th>Matched</th><th>Needs review</th><th>Potential gaps</th><th></th></tr></thead><tbody id="results-table-body"></tbody></table></div></section>
+        <footer class="footer-text">Local prototype · Live search, OCR, and matching require the corresponding backend endpoints.</footer>
     </main>
-
-    <script>
-        const dropZone = document.getElementById("drop-zone");
-        const fileInput = document.getElementById("file-input");
-        const fileInfo = document.getElementById("file-info");
-        const fileName = document.getElementById("file-name");
-        const fileSize = document.getElementById("file-size");
-        const removeButton = document.getElementById("remove-button");
-        const submitButton = document.getElementById("submit-button");
-        let selectedFile = null;
-
-        dropZone.addEventListener("click", () => fileInput.click());
-
-        dropZone.addEventListener("keydown", (event) => {
-            if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                fileInput.click();
-            }
-        });
-
-        fileInput.addEventListener("change", () => {
-            if (fileInput.files.length > 0) selectFile(fileInput.files[0]);
-        });
-
-        dropZone.addEventListener("dragover", (event) => {
-            event.preventDefault();
-            dropZone.classList.add("drag-over");
-        });
-
-        dropZone.addEventListener("dragleave", (event) => {
-            if (!dropZone.contains(event.relatedTarget)) dropZone.classList.remove("drag-over");
-        });
-
-        dropZone.addEventListener("drop", (event) => {
-            event.preventDefault();
-            dropZone.classList.remove("drag-over");
-            if (event.dataTransfer.files.length > 0) selectFile(event.dataTransfer.files[0]);
-        });
-
-        function selectFile(file) {
-            selectedFile = file;
-            fileName.textContent = file.name;
-            fileSize.textContent = formatFileSize(file.size);
-            fileInfo.style.display = "flex";
-            submitButton.disabled = false;
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes < 1024) return bytes + " bytes";
-            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-            return (bytes / (1024 * 1024)).toFixed(2) + " MB";
-        }
-
-        removeButton.addEventListener("click", () => {
-            selectedFile = null;
-            fileInput.value = "";
-            fileInfo.style.display = "none";
-            submitButton.disabled = true;
-        });
-
-        submitButton.addEventListener("click", () => {
-            if (selectedFile) {
-                alert("File selected: " + selectedFile.name + "\n\nActual submission functionality will be added later.");
-            }
-        });
-    </script>
+    <script src="js/index.js" defer></script>
 </body>
 </html>
